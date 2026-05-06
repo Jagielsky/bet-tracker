@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Dziennik Kuponów</title>
+    <title>Kupony</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,275 +15,210 @@
     />
     <style>
       :root {
-        --bg: #0a0b0d;
-        --bg2: #111318;
-        --bg3: #181b22;
-        --border: #252830;
-        --border2: #2e3340;
-        --green: #00e676;
-        --green-dim: #00c85a;
-        --red: #ff4444;
-        --red-dim: #cc2222;
-        --amber: #ffb300;
-        --discord: #5865f2;
-        --discord-hover: #4752c4;
-        --text: #e8ecf0;
-        --text2: #8a93a0;
-        --text3: #555d6b;
+        --bg-main: #0a0a0c;
+        --bg-panel: #121316;
+        --bg-element: #1a1c21;
+        --border: #2a2d35;
+        --border-focus: #555d6b;
+
+        --text-main: #ffffff;
+        --text-muted: #8a93a0;
+
         --win: #00e676;
+        --win-bg: #052e18;
+        --win-border: #0a522d;
+
         --lose: #ff4444;
+        --lose-bg: #330e0e;
+        --lose-border: #5c1818;
+
         --pending: #ffb300;
-        --card-radius: 8px;
-        --font-mono:
-          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+        --pending-bg: #332400;
+        --pending-border: #5c4100;
+
+        --font-main: "Inter", sans-serif;
       }
+
       * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-      }
-      body {
-        background: var(--bg);
-        color: var(--text);
-        font-family: var(--font-sans);
-        font-size: 14px;
-        min-height: 100vh;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        border-radius: 0 !important;
       }
 
-      .app {
+      body {
+        background: var(--bg-main);
+        color: var(--text-main);
+        font-family: var(--font-main);
+        font-size: 14px;
+        min-height: 100vh;
+      }
+
+      .app-layout {
         display: grid;
-        grid-template-columns: 360px 1fr;
+        grid-template-columns: 280px 1fr;
         min-height: 100vh;
       }
 
       .sidebar {
-        background: var(--bg2);
+        background: var(--bg-panel);
         border-right: 1px solid var(--border);
-        padding: 32px 24px;
+        padding: 30px 20px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
-        height: 100vh;
+        gap: 24px;
         position: sticky;
         top: 0;
+        height: 100vh;
         overflow-y: auto;
       }
 
-      .brand-header {
-        margin-bottom: 8px;
-      }
-      .logo {
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        color: var(--text);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 4px;
-      }
-      .logo span {
-        color: var(--green);
-        font-weight: 500;
-      }
-      .logo-dot {
-        width: 8px;
-        height: 8px;
-        background: var(--green);
-        border-radius: 50%;
-      }
-      .header-date {
-        color: var(--text2);
-        font-size: 13px;
-        font-weight: 500;
-      }
-
-      .form-card {
-        background: var(--bg3);
-        border: 1px solid var(--border);
-        border-radius: var(--card-radius);
-        padding: 20px;
-      }
-      .form-title {
+      .current-date {
+        color: var(--text-muted);
         font-size: 12px;
         font-weight: 600;
-        color: var(--text);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 16px;
+        letter-spacing: 1px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 12px;
       }
+
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
       .field {
-        margin-bottom: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
+
       .field label {
-        display: block;
         font-size: 11px;
-        font-weight: 500;
-        color: var(--text2);
+        font-weight: 600;
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        margin-bottom: 6px;
-      }
-      .field input,
-      .field select {
-        width: 100%;
-        background: var(--bg);
-        border: 1px solid var(--border2);
-        border-radius: 6px;
-        padding: 10px 12px;
-        color: var(--text);
-        font-family: var(--font-sans);
-        font-size: 14px;
-        outline: none;
-        transition: border-color 0.2s ease;
-      }
-      .field input:focus,
-      .field select:focus {
-        border-color: var(--green);
-      }
-      .field-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-      .profit-display {
-        background: var(--bg);
-        border: 1px solid var(--border2);
-        border-radius: 6px;
-        padding: 10px 12px;
-        color: var(--green);
-        font-size: 16px;
-        font-weight: 600;
-      }
-      .btn-add {
-        width: 100%;
-        background: var(--green);
-        color: #000;
-        border: none;
-        border-radius: 6px;
-        padding: 12px;
-        font-family: var(--font-sans);
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        transition:
-          background 0.2s ease,
-          transform 0.1s;
-      }
-      .btn-add:hover {
-        background: var(--green-dim);
-      }
-      .btn-add:active {
-        transform: scale(0.98);
       }
 
-      .day-summary {
-        background: var(--bg3);
+      .field input {
+        background: var(--bg-element);
         border: 1px solid var(--border);
-        border-radius: var(--card-radius);
-        padding: 20px;
-      }
-      .summary-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin: 16px 0;
-      }
-      .summary-stat {
-        background: var(--bg);
-        border-radius: 6px;
+        color: var(--text-main);
         padding: 12px;
+        font-family: var(--font-main);
+        font-size: 15px;
+        outline: none;
+        transition: border-color 0.15s;
+        text-align: center;
       }
-      .summary-stat .val {
-        font-size: 17px;
+
+      .field input:focus {
+        border-color: var(--border-focus);
+      }
+
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input[type="number"] {
+        appearance: textfield;
+        -moz-appearance: textfield;
+      }
+
+      .btn-add {
+        background: var(--text-main);
+        color: var(--bg-main);
+        border: none;
+        padding: 14px;
         font-weight: 700;
-        word-break: break-word;
-      }
-      .summary-stat .lbl {
-        font-size: 11px;
-        font-weight: 500;
-        color: var(--text3);
+        font-size: 13px;
+        cursor: pointer;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-top: 4px;
-      }
-      .val.green {
-        color: var(--green);
-      }
-      .val.red {
-        color: var(--red);
-      }
-      .val.amber {
-        color: var(--amber);
-      }
-
-      .btn-discord {
-        width: 100%;
-        background: var(--discord);
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 12px;
-        font-family: var(--font-sans);
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s ease;
+        letter-spacing: 1px;
+        transition: background 0.15s;
         margin-top: 8px;
+      }
+
+      .btn-add:hover {
+        background: #d0d4dc;
+      }
+
+      .main-content {
+        padding: 30px 40px;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
-      .btn-discord:hover {
-        background: var(--discord-hover);
-      }
-      .btn-discord:active {
-        transform: scale(0.98);
+        flex-direction: column;
+        gap: 36px;
       }
 
-      .main {
-        padding: 40px 48px;
-        overflow-y: auto;
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 16px;
+        width: 100%;
       }
 
-      .tabs {
+      .stat-box {
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        padding: 20px;
         display: flex;
-        gap: 4px;
-        margin-bottom: 24px;
-        background: var(--bg2);
-        border-radius: 8px;
-        padding: 4px;
-        width: fit-content;
-      }
-      .tab {
-        padding: 8px 24px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 13px;
-        color: var(--text2);
-        font-family: var(--font-sans);
-        font-weight: 500;
-        transition: all 0.2s ease;
-        border: none;
-        background: transparent;
-      }
-      .tab.active {
-        background: var(--bg3);
-        color: var(--text);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-      }
-      .tab:hover:not(.active) {
-        color: var(--text);
+        flex-direction: column;
+        gap: 6px;
       }
 
-      .coupons-view {
-        max-width: 980px;
+      .stat-box .stat-lbl {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .stat-box .stat-val {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+
+      .coupons-section {
+        width: 100%;
+        max-width: 900px;
         margin: 0 auto;
       }
+
+      .day-divider {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-bottom: 1px solid var(--border-focus);
+        padding-bottom: 8px;
+        margin-top: 32px;
+        margin-bottom: 16px;
+      }
+      .day-divider:first-child {
+        margin-top: 10px;
+      }
+
+      .day-date {
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .day-balance {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
       .coupons-list {
         display: flex;
         flex-direction: column;
@@ -291,407 +226,150 @@
       }
 
       .coupon-card {
-        background: var(--bg2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bg-panel);
         border: 1px solid var(--border);
-        border-radius: var(--card-radius);
-        overflow: hidden;
-        transition: border-color 0.2s ease;
+        padding: 16px 20px;
       }
-      .coupon-card:hover {
-        border-color: var(--border2);
-      }
+
       .coupon-card.win {
-        border-left: 4px solid var(--win);
+        background: var(--win-bg);
+        border-color: var(--win-border);
       }
       .coupon-card.lose {
-        border-left: 4px solid var(--lose);
+        background: var(--lose-bg);
+        border-color: var(--lose-border);
       }
       .coupon-card.pending {
-        border-left: 4px solid var(--pending);
+        background: var(--pending-bg);
+        border-color: var(--pending-border);
       }
 
-      .coupon-header {
+      .cc-data-group {
         display: flex;
+        gap: 40px;
         align-items: center;
-        justify-content: space-between;
-        padding: 14px 20px 10px;
-      }
-      .coupon-datetime {
-        font-size: 12px;
-        color: var(--text3);
-        font-weight: 500;
-      }
-      .coupon-status-btn {
-        display: flex;
-        gap: 6px;
-      }
-      .status-btn {
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 600;
-        font-family: var(--font-sans);
-        cursor: pointer;
-        border: 1px solid transparent;
-        transition: all 0.15s ease;
-        background: transparent;
-      }
-      .status-btn.win {
-        color: var(--win);
-        border-color: rgba(0, 230, 118, 0.3);
-      }
-      .status-btn.win.active,
-      .status-btn.win:hover {
-        background: rgba(0, 230, 118, 0.15);
-        border-color: var(--win);
       }
 
-      .status-btn.lose {
-        color: var(--lose);
-        border-color: rgba(255, 68, 68, 0.3);
-      }
-      .status-btn.lose.active,
-      .status-btn.lose:hover {
-        background: rgba(255, 68, 68, 0.15);
-        border-color: var(--lose);
-      }
-
-      .status-btn.pending {
-        color: var(--pending);
-        border-color: rgba(255, 179, 0, 0.3);
-      }
-      .status-btn.pending.active,
-      .status-btn.pending:hover {
-        background: rgba(255, 179, 0, 0.15);
-        border-color: var(--pending);
-      }
-
-      .coupon-body {
-        padding: 0 20px 16px;
-        display: grid;
-        grid-template-columns: 1fr auto auto auto auto;
-        gap: 24px;
-        align-items: end;
-      }
-      .coupon-desc {
-        font-size: 15px;
-        font-weight: 500;
-        color: var(--text);
-        line-height: 1.4;
-      }
-      .coupon-meta {
-        text-align: right;
-      }
-      .coupon-meta .label {
-        font-size: 11px;
-        font-weight: 500;
-        color: var(--text3);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-      }
-      .coupon-meta .value {
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--text);
-      }
-      .coupon-meta .value.profit {
-        color: var(--green);
-      }
-      .coupon-meta .value.loss {
-        color: var(--red);
-      }
-
-      .coupon-delete {
-        background: rgba(255, 68, 68, 0.08);
-        border: 1px solid rgba(255, 68, 68, 0.22);
-        cursor: pointer;
-        color: var(--red);
-        font-size: 12px;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        transition:
-          background 0.2s ease,
-          border-color 0.2s ease,
-          color 0.2s ease;
-        align-self: center;
-        margin-left: 8px;
-      }
-      .coupon-delete:hover {
-        background: rgba(255, 68, 68, 0.16);
-        border-color: var(--red);
-      }
-
-      .day-divider {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 16px 0 8px;
-      }
-      .day-divider-label {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text2);
-        white-space: nowrap;
-      }
-      .day-divider-line {
-        flex: 1;
-        height: 1px;
-        background: var(--border);
-      }
-      .day-badge {
-        font-size: 12px;
-        font-weight: 600;
-        padding: 4px 12px;
-        border-radius: 4px;
-        background: var(--bg3);
-        color: var(--text3);
-        white-space: nowrap;
-      }
-      .day-badge.green {
-        color: var(--green);
-      }
-      .day-badge.red {
-        color: var(--red);
-      }
-
-      .stats-view {
-        display: none;
-      }
-      .stats-view.active {
-        display: block;
-      }
-      .coupons-view {
-        display: none;
-      }
-      .coupons-view.active {
-        display: block;
-      }
-
-      .stats-header-container {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        margin-bottom: 16px;
-      }
-      .stats-header {
-        font-size: 24px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-        color: var(--text);
-        margin-bottom: 6px;
-      }
-      .stats-sub {
-        font-size: 13px;
-        color: var(--text2);
-      }
-      .stats-cards {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 24px;
-      }
-      .stat-card {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: var(--card-radius);
-        padding: 20px;
-      }
-      .stat-card .s-val {
-        font-size: 26px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-        margin-bottom: 6px;
-        word-break: break-word;
-      }
-      .stat-card .s-lbl {
-        font-size: 11px;
-        font-weight: 500;
-        color: var(--text3);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      .stat-card .s-sub {
-        font-size: 12px;
-        color: var(--text2);
-        margin-top: 6px;
-      }
-
-      .chart-section {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: var(--card-radius);
-        padding: 20px;
-        margin-bottom: 24px;
-      }
-      .chart-title {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text2);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 20px;
-      }
-      .bar-chart {
-        display: flex;
-        align-items: flex-end;
-        gap: 8px;
-        height: 120px;
-      }
-      .bar-wrap {
-        flex: 1;
+      .cc-metric {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 6px;
-        height: 100%;
-        justify-content: flex-end;
-      }
-      .bar {
-        width: 100%;
-        border-radius: 4px 4px 0 0;
-        min-height: 2px;
-        transition: height 0.3s ease;
-        position: relative;
-        cursor: pointer;
-      }
-      .bar.positive {
-        background: var(--green);
-        opacity: 0.8;
-      }
-      .bar.negative {
-        background: var(--red);
-        opacity: 0.8;
-      }
-      .bar.zero {
-        background: var(--border2);
-      }
-      .bar-lbl {
-        font-size: 10px;
-        color: var(--text3);
-        text-align: center;
-        font-weight: 500;
+        gap: 4px;
       }
 
-      .history-section {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: var(--card-radius);
-        overflow-x: auto;
-      }
-      .history-table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 400px;
-      }
-      .history-table th {
-        background: var(--bg3);
-        padding: 14px 20px;
-        text-align: left;
-        font-size: 11px;
+      .cc-lbl {
+        font-size: 10px;
         font-weight: 600;
-        color: var(--text3);
         text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.5);
         letter-spacing: 0.5px;
-        border-bottom: 1px solid var(--border);
-        white-space: nowrap;
       }
-      .history-table td {
-        padding: 14px 20px;
-        border-bottom: 1px solid var(--border);
-        font-size: 14px;
-        color: var(--text);
-        white-space: nowrap;
+
+      .cc-val {
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+        font-variant-numeric: tabular-nums;
       }
-      .history-table tr:hover td {
-        background: var(--bg3);
+
+      .cc-actions-group {
+        display: flex;
+        align-items: center;
+        gap: 16px;
       }
-      .badge {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 600;
+
+      .status-actions {
+        display: flex;
+        gap: 4px;
       }
-      .badge.win {
-        background: rgba(0, 230, 118, 0.15);
-        color: var(--win);
+
+      .btn-status {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-main);
+        padding: 8px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
       }
-      .badge.lose {
-        background: rgba(255, 68, 68, 0.15);
+
+      .btn-status:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .btn-status.active-win {
+        background: var(--win);
+        border-color: var(--win);
+        color: #000;
+      }
+      .btn-status.active-lose {
+        background: var(--lose);
+        border-color: var(--lose);
+        color: #fff;
+      }
+      .btn-status.active-pending {
+        background: var(--pending);
+        border-color: var(--pending);
+        color: #000;
+      }
+
+      .btn-delete {
+        background: transparent;
+        border: 1px solid rgba(255, 68, 68, 0.4);
         color: var(--lose);
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .btn-delete:hover {
+        background: rgba(255, 68, 68, 0.15);
       }
 
       .empty-state {
+        padding: 40px;
         text-align: center;
-        padding: 80px 20px;
-        color: var(--text3);
-      }
-      .empty-state .icon {
-        font-size: 48px;
-        margin-bottom: 16px;
-        opacity: 0.8;
-      }
-      .empty-state p {
-        font-size: 16px;
+        color: var(--text-muted);
+        background: var(--bg-panel);
+        border: 1px dashed var(--border);
         font-weight: 500;
-        color: var(--text2);
-        margin-bottom: 8px;
-      }
-
-      .period-select {
-        background: var(--bg);
-        border: 1px solid var(--border2);
-        color: var(--text);
-        font-family: var(--font-sans);
-        font-size: 13px;
-        padding: 8px 16px;
-        border-radius: 6px;
-        outline: none;
-        cursor: pointer;
       }
 
       .toast {
         position: fixed;
-        bottom: 24px;
-        right: 24px;
-        left: 24px;
-        background: var(--bg3);
-        border: 1px solid var(--border2);
-        border-radius: 8px;
-        padding: 14px 20px;
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text);
-        z-index: 999;
+        bottom: 20px;
+        right: 20px;
+        background: var(--bg-element);
+        border: 1px solid var(--border);
+        padding: 16px 24px;
+        font-weight: 600;
         opacity: 0;
-        transform: translateY(12px);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         pointer-events: none;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        text-align: center;
-      }
-      @media (min-width: 600px) {
-        .toast {
-          left: auto;
-          min-width: 250px;
-        }
+        transition: opacity 0.3s;
+        z-index: 999;
       }
       .toast.show {
         opacity: 1;
-        transform: translateY(0);
       }
       .toast.success {
-        border-bottom: 4px solid var(--green);
+        border-left: 4px solid var(--win);
       }
       .toast.error {
-        border-bottom: 4px solid var(--red);
+        border-left: 4px solid var(--lose);
       }
 
-      @media (max-width: 900px) {
-        .app {
+      @media (max-width: 1400px) {
+        .stats-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (max-width: 1000px) {
+        .app-layout {
           grid-template-columns: 1fr;
         }
         .sidebar {
@@ -699,244 +377,102 @@
           position: relative;
           border-right: none;
           border-bottom: 1px solid var(--border);
-          padding: 24px 20px;
         }
-        .main {
-          padding: 24px 20px;
+        .main-content {
+          padding: 20px;
         }
-        .stats-cards {
-          grid-template-columns: repeat(2, 1fr);
+        .coupon-card {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 20px;
+        }
+        .cc-data-group {
+          width: 100%;
+          justify-content: space-between;
+          gap: 10px;
+        }
+        .cc-actions-group {
+          width: 100%;
+          justify-content: space-between;
         }
       }
-
       @media (max-width: 600px) {
-        .app {
-          display: flex;
-          flex-direction: column;
-        }
-        .main {
-          padding: 20px 16px;
-        }
-        .sidebar {
-          padding: 20px 16px;
-        }
-        .coupon-body {
+        .stats-grid {
           grid-template-columns: 1fr 1fr;
-          gap: 16px 12px;
         }
-        .coupon-desc {
-          grid-column: 1 / -1;
-          margin-bottom: 4px;
-        }
-        .coupon-meta {
-          text-align: left;
-        }
-        .coupon-delete {
-          grid-column: 1 / -1;
-          margin-left: 0;
-          margin-top: 8px;
-          width: 100%;
-          justify-self: stretch;
-          background: rgba(255, 68, 68, 0.1);
-          color: var(--red);
-          border-radius: 6px;
-          padding: 10px;
-          text-align: center;
-          font-size: 14px;
-          font-weight: 600;
-        }
-        .coupon-header {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 12px;
-        }
-        .coupon-status-btn {
-          width: 100%;
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-        }
-        .status-btn {
-          text-align: center;
-          padding: 8px 4px;
-        }
-        .stats-header-container {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 16px;
-        }
-        .period-select {
-          width: 100%;
+        .cc-data-group {
+          flex-wrap: wrap;
         }
       }
     </style>
   </head>
   <body>
-    <div class="app">
+    <div class="app-layout">
       <div class="sidebar">
-        <div class="brand-header">
-          <div class="logo">
-            <div class="logo-dot"></div>
-            Dziennik<span>Kuponów</span>
-          </div>
-          <div class="header-date" id="headerDate"></div>
-        </div>
+        <div class="current-date" id="headerDate"></div>
 
-        <div class="form-card">
-          <div class="form-title">+ Nowy kupon</div>
-
-          <div class="field">
-            <label>Opis / Wydarzenie (Opcjonalnie)</label>
-            <input
-              type="text"
-              id="f-desc"
-              placeholder="np. Real Madryt — Barcelona"
-            />
-          </div>
-
+        <div class="field-group">
           <div class="field">
             <label>Data</label>
             <input type="date" id="f-date" />
           </div>
 
-          <div class="field-row">
-            <div class="field">
-              <label>Kurs</label>
-              <input
-                type="number"
-                id="f-odds"
-                placeholder="2.15"
-                step="0.01"
-                min="1.00"
-              />
-            </div>
-            <div class="field">
-              <label>Stawka (zł)</label>
-              <input
-                type="number"
-                id="f-stake"
-                placeholder="50"
-                step="1"
-                min="0.01"
-              />
-            </div>
-          </div>
           <div class="field">
-            <label>Potencjalny zysk netto</label>
-            <div class="profit-display" id="profit-preview">— zł</div>
+            <label>Kurs całkowity</label>
+            <input
+              type="number"
+              id="f-odds"
+              placeholder="Np. 2.50"
+              step="0.01"
+              min="1.00"
+            />
           </div>
-          <button class="btn-add" onclick="addCoupon()">DODAJ KUPON</button>
-        </div>
 
-        <div class="day-summary">
-          <div class="form-title" style="margin-bottom: 12px">
-            Podsumowanie dnia
+          <div class="field">
+            <label>Stawka (zł)</label>
+            <input
+              type="number"
+              id="f-stake"
+              placeholder="Np. 100"
+              step="1"
+              min="0.01"
+            />
           </div>
-          <div class="summary-grid">
-            <div class="summary-stat">
-              <div class="val" id="td-count">0</div>
-              <div class="lbl">Kuponów</div>
-            </div>
-            <div class="summary-stat">
-              <div class="val amber" id="td-stake">0 zł</div>
-              <div class="lbl">Łączna Stawka</div>
-            </div>
-            <div class="summary-stat">
-              <div class="val green" id="td-payout">0 zł</div>
-              <div class="lbl">Łączna Wypłata</div>
-            </div>
-            <div class="summary-stat">
-              <div class="val" id="td-balance">0 zł</div>
-              <div class="lbl">Zysk/Strata</div>
-            </div>
-          </div>
-          <button class="btn-discord" onclick="copyDiscordSummary()">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 127.14 96.36"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c2.64-27.38-4.51-51.11-19.32-72.1ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.33,46,96.22,53,91.08,65.69,84.69,65.69Z"
-              />
-            </svg>
-            Udostępnij na Discord
-          </button>
+
+          <button class="btn-add" onclick="addCoupon()">Dodaj Kupon</button>
         </div>
       </div>
 
-      <div class="main">
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('coupons')">
-            Kupony
-          </button>
-          <button class="tab" onclick="switchTab('stats')">Statystyki</button>
+      <div class="main-content">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-lbl">Zysk / Strata</div>
+            <div class="stat-val" id="stat-profit">0.00 zł</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Yield</div>
+            <div class="stat-val" id="stat-yield">0.0%</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Zainwestowano</div>
+            <div class="stat-val" id="stat-invested">0.00 zł</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Średni Kurs</div>
+            <div class="stat-val" id="stat-avg-odds">0.00</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Skuteczność (W/L)</div>
+            <div class="stat-val" id="stat-wr">0%</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-lbl">Bilans (W / L / ?)</div>
+            <div class="stat-val" id="stat-counts">0 / 0 / 0</div>
+          </div>
         </div>
 
-        <div class="coupons-view active" id="view-coupons">
-          <div id="coupons-list-container"></div>
-        </div>
-
-        <div class="stats-view" id="view-stats">
-          <div class="stats-header-container">
-            <div>
-              <div class="stats-header" id="stats-title">Statystyki</div>
-              <div class="stats-sub" id="stats-sub"></div>
-            </div>
-            <select
-              class="period-select"
-              id="period-select"
-              onchange="renderStats()"
-            >
-              <option value="week">Ten tydzień</option>
-              <option value="month">Ten miesiąc</option>
-              <option value="all">Wszystkie</option>
-            </select>
-          </div>
-
-          <div class="stats-cards">
-            <div class="stat-card">
-              <div class="s-val green" id="s-profit">0 zł</div>
-              <div class="s-lbl">Zysk / Strata</div>
-              <div class="s-sub" id="s-roi">Yield: —</div>
-            </div>
-            <div class="stat-card">
-              <div class="s-val" id="s-total">0</div>
-              <div class="s-lbl">Wszystkich kuponów</div>
-              <div class="s-sub" id="s-stake-total">Stawka: 0 zł</div>
-            </div>
-            <div class="stat-card">
-              <div class="s-val green" id="s-wins">0</div>
-              <div class="s-lbl">Wygrane</div>
-              <div class="s-sub" id="s-wr">Skuteczność: —</div>
-            </div>
-            <div class="stat-card">
-              <div class="s-val amber" id="s-avg-odds">—</div>
-              <div class="s-lbl">Śr. kurs</div>
-              <div class="s-sub" id="s-avg-stake">Śr. stawka: —</div>
-            </div>
-          </div>
-
-          <div class="chart-section">
-            <div class="chart-title">Bilans dzienny</div>
-            <div class="bar-chart" id="bar-chart"></div>
-          </div>
-
-          <div class="history-section">
-            <table class="history-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Kupony</th>
-                  <th>Stawka</th>
-                  <th>W/P</th>
-                  <th>Bilans</th>
-                </tr>
-              </thead>
-              <tbody id="history-body"></tbody>
-            </table>
-          </div>
+        <div class="coupons-section">
+          <div class="coupons-list" id="coupons-container"></div>
         </div>
       </div>
     </div>
@@ -944,45 +480,37 @@
     <div class="toast" id="toast"></div>
 
     <script>
-      let coupons = JSON.parse(localStorage.getItem("bt_coupons") || "[]");
+      let coupons = JSON.parse(localStorage.getItem("bt_coupons_v3") || "[]");
 
       function save() {
-        localStorage.setItem("bt_coupons", JSON.stringify(coupons));
+        localStorage.setItem("bt_coupons_v3", JSON.stringify(coupons));
       }
 
       const today = () => new Date().toISOString().slice(0, 10);
 
-      document.getElementById("f-date").value = today();
-      document.getElementById("headerDate").textContent =
-        new Date().toLocaleDateString("pl-PL", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
+      // Funkcja formatująca datę z YYYY-MM-DD na polski format (np. 5 maja 2026)
+      function formatDatePL(dateStr) {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString("pl-PL", {
           day: "numeric",
+          month: "long",
+          year: "numeric",
         });
+      }
 
-      ["f-odds", "f-stake"].forEach((id) =>
-        document.getElementById(id).addEventListener("input", updateProfit),
+      document.getElementById("f-date").value = today();
+      document.getElementById("headerDate").textContent = formatDatePL(
+        new Date(),
       );
 
-      function updateProfit() {
-        const odds = parseFloat(document.getElementById("f-odds").value) || 0;
-        const stake = parseFloat(document.getElementById("f-stake").value) || 0;
-        if (odds >= 1 && stake > 0) {
-          const profit = (odds * stake - stake).toFixed(2);
-          document.getElementById("profit-preview").textContent =
-            "+" + fmt(profit) + " zł";
-          document.getElementById("profit-preview").style.color =
-            "var(--green)";
-        } else {
-          document.getElementById("profit-preview").textContent = "— zł";
-          document.getElementById("profit-preview").style.color =
-            "var(--text3)";
-        }
+      function fmt(n) {
+        return parseFloat(n).toLocaleString("pl-PL", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
       }
 
       function addCoupon() {
-        const desc = document.getElementById("f-desc").value.trim();
         const date = document.getElementById("f-date").value;
         const odds = parseFloat(document.getElementById("f-odds").value);
         const stake = parseFloat(document.getElementById("f-stake").value);
@@ -996,34 +524,27 @@
           return;
         }
         if (stake <= 0) {
-          toast("Stawka musi być > 0", "error");
+          toast("Stawka musi być większa niż 0", "error");
           return;
         }
 
         const profit = parseFloat((odds * stake - stake).toFixed(2));
-        const id = Date.now().toString();
 
         coupons.unshift({
-          id,
-          desc:
-            desc ||
-            "Kupon " + (coupons.filter((c) => c.date === date).length + 1),
+          id: Date.now().toString(),
           date,
           odds,
           stake,
           profit,
           status: "pending",
-          added: new Date().toISOString(),
         });
+
         save();
         renderAll();
-        toast("Kupon dodany!", "success");
+        toast("Dodano kupon", "success");
 
-        document.getElementById("f-desc").value = "";
         document.getElementById("f-odds").value = "";
         document.getElementById("f-stake").value = "";
-        document.getElementById("f-date").value = today();
-        updateProfit();
       }
 
       function setStatus(id, status) {
@@ -1036,374 +557,155 @@
       }
 
       function deleteCoupon(id) {
-        if (!confirm("Usunąć kupon?")) return;
+        if (!confirm("Czy na pewno chcesz usunąć ten kupon?")) return;
         coupons = coupons.filter((x) => x.id !== id);
         save();
         renderAll();
       }
 
-      function copyDiscordSummary() {
-        const t = today();
-        const day = coupons.filter((c) => c.date === t).reverse();
+      function renderStats() {
+        const resolved = coupons.filter((c) => c.status !== "pending");
+        const wins = coupons.filter((c) => c.status === "win");
+        const losses = coupons.filter((c) => c.status === "lose");
+        const pending = coupons.filter((c) => c.status === "pending");
 
-        if (day.length === 0) {
-          toast("Brak kuponów z dzisiaj do skopiowania", "error");
-          return;
-        }
+        const totalStake = coupons.reduce((s, c) => s + c.stake, 0);
 
-        const pad = (str, len) => (str + " ".repeat(len)).slice(0, len);
-        const dDate = new Date(t);
-        const dayStr = String(dDate.getDate()).padStart(2, "0");
-        const monthStr = String(dDate.getMonth() + 1).padStart(2, "0");
-
-        let msg = `📊 **Statystyka – ${dayStr}.${monthStr}**\n\n`;
-        msg += `\`\`\`text\n`;
-        msg += `Kupon | Kurs | Stawka | Wynik | Wypłata | Zysk/Strata\n`;
-        msg += `-----------------------------------------------------\n`;
-
-        let totalStake = 0;
-        let totalPayout = 0;
-        let totalBalance = 0;
-
-        day.forEach((c, index) => {
-          const num = String(index + 1);
-          const odds = c.odds.toFixed(2);
-          const stake = fmt(c.stake) + " zł";
-
-          let wynik = "?";
-          let payout = 0;
-          let net = 0;
-
-          if (c.status === "win") {
-            wynik = "W";
-            payout = c.stake + c.profit;
-            net = c.profit;
-          } else if (c.status === "lose") {
-            wynik = "L";
-            payout = 0;
-            net = -c.stake;
-          }
-
-          totalStake += c.stake;
-          totalPayout += payout;
-          totalBalance += net;
-
-          const payoutStr = fmt(payout) + " zł";
-          const netStr = (net > 0 ? "+" : "") + fmt(net) + " zł";
-
-          msg += `${pad(num, 5)} | ${pad(odds, 4)} | ${pad(stake, 6)} | ${pad(wynik, 5)} | ${pad(payoutStr, 7)} | ${netStr}\n`;
+        let totalProfit = 0;
+        resolved.forEach((c) => {
+          if (c.status === "win") totalProfit += c.profit;
+          else if (c.status === "lose") totalProfit -= c.stake;
         });
 
-        msg += `\`\`\`\n`;
+        const yieldPct = totalStake > 0 ? (totalProfit / totalStake) * 100 : 0;
+        const winRate = resolved.length
+          ? (wins.length / resolved.length) * 100
+          : 0;
+        const avgOdds = coupons.length
+          ? coupons.reduce((s, c) => s + c.odds, 0) / coupons.length
+          : 0;
 
-        const balLabel = totalBalance >= 0 ? "Zysk" : "Strata";
-        const balSign = totalBalance > 0 ? "+" : "";
+        const pEl = document.getElementById("stat-profit");
+        pEl.textContent =
+          (totalProfit > 0 ? "+" : "") + fmt(totalProfit) + " zł";
+        pEl.style.color =
+          totalProfit > 0
+            ? "var(--win)"
+            : totalProfit < 0
+              ? "var(--lose)"
+              : "var(--text-main)";
 
-        msg += `💰 **Podsumowanie dnia:**\n`;
-        msg += `• Łączna stawka: **${fmt(totalStake)} zł**\n`;
-        msg += `• Łączna wypłata: **${fmt(totalPayout)} zł**\n`;
-        msg += `• ${balLabel}: **${balSign}${fmt(totalBalance)} zł**`;
+        const yieldEl = document.getElementById("stat-yield");
+        yieldEl.textContent =
+          (yieldPct > 0 ? "+" : "") + yieldPct.toFixed(1) + "%";
+        yieldEl.style.color =
+          yieldPct > 0
+            ? "var(--win)"
+            : yieldPct < 0
+              ? "var(--lose)"
+              : "var(--text-main)";
 
-        navigator.clipboard
-          .writeText(msg)
-          .then(() => {
-            toast("Skopiowano podsumowanie!", "success");
-          })
-          .catch(() => {
-            toast("Błąd kopiowania", "error");
-          });
+        document.getElementById("stat-invested").textContent =
+          fmt(totalStake) + " zł";
+        document.getElementById("stat-avg-odds").textContent =
+          avgOdds.toFixed(2);
+        document.getElementById("stat-wr").textContent =
+          winRate.toFixed(0) + "%";
+        document.getElementById("stat-counts").textContent =
+          `${wins.length} / ${losses.length} / ${pending.length}`;
       }
 
       function renderCoupons() {
-        const container = document.getElementById("coupons-list-container");
+        const container = document.getElementById("coupons-container");
         if (!coupons.length) {
-          container.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>Brak kuponów</p></div>`;
+          container.innerHTML = `<div class="empty-state">Nie dodano jeszcze żadnych kuponów.</div>`;
           return;
         }
 
+        // Grupowanie według daty
         const byDate = {};
         coupons.forEach((c) => {
           if (!byDate[c.date]) byDate[c.date] = [];
           byDate[c.date].push(c);
         });
-        const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+
+        // Sortowanie dat od najnowszej
+        const sortedDates = Object.keys(byDate).sort((a, b) =>
+          b.localeCompare(a),
+        );
 
         let html = "";
-        dates.forEach((date) => {
-          const dayCoupons = byDate[date];
-          const dayBalance = calcBalance(dayCoupons);
-          const balClass =
-            dayBalance > 0 ? "green" : dayBalance < 0 ? "red" : "";
-          const dateLabel = formatDate(date);
 
-          html += `<div class="day-divider">
-      <div class="day-divider-label">${dateLabel}</div>
-      <div class="day-divider-line"></div>
-      <div class="day-badge ${balClass}">${dayBalance >= 0 ? "+" : ""}${fmt(dayBalance)} zł</div>
-    </div>`;
+        sortedDates.forEach((date) => {
+          // Obliczanie bilansu z danego dnia
+          let dayBalance = 0;
+          byDate[date].forEach((c) => {
+            if (c.status === "win") dayBalance += c.profit;
+            else if (c.status === "lose") dayBalance -= c.stake;
+          });
 
-          dayCoupons.forEach((c) => {
-            let resultColor = "";
-            let resultLabel = "?";
+          let balColor = "var(--text-main)";
+          let balPrefix = "";
+          if (dayBalance > 0) {
+            balColor = "var(--win)";
+            balPrefix = "+";
+          } else if (dayBalance < 0) {
+            balColor = "var(--lose)";
+          }
+
+          const formattedDate = formatDatePL(date);
+
+          html += `
+            <div class="day-divider">
+              <div class="day-date">${formattedDate}</div>
+              <div class="day-balance" style="color: ${balColor}">Bilans: ${balPrefix}${fmt(dayBalance)} zł</div>
+            </div>
+          `;
+
+          // Generowanie kuponów dla danego dnia
+          byDate[date].forEach((c) => {
+            let resultVal = "—";
+            let resultColor = "#ffffff";
 
             if (c.status === "win") {
-              resultColor = "profit";
-              resultLabel = "+" + fmt(c.profit);
+              resultVal = "+" + fmt(c.profit) + " zł";
+              resultColor = "var(--win)";
             } else if (c.status === "lose") {
-              resultColor = "loss";
-              resultLabel = "-" + fmt(c.stake);
+              resultVal = "-" + fmt(c.stake) + " zł";
+              resultColor = "var(--lose)";
             }
 
-            html += `<div class="coupon-card ${c.status}">
-        <div class="coupon-header">
-          <div class="coupon-datetime">${formatDate(c.date)}</div>
-          <div class="coupon-status-btn">
-            <button class="status-btn win ${c.status === "win" ? "active" : ""}" onclick="setStatus('${c.id}','win')">WYGRANA</button>
-            <button class="status-btn lose ${c.status === "lose" ? "active" : ""}" onclick="setStatus('${c.id}','lose')">PRZEGRANA</button>
-            <button class="status-btn pending ${c.status === "pending" ? "active" : ""}" onclick="setStatus('${c.id}','pending')">OCZEKUJE</button>
-          </div>
-        </div>
-        <div class="coupon-body">
-          <div class="coupon-desc">${esc(c.desc)}</div>
-          <div class="coupon-meta">
-            <div class="label">Kurs</div>
-            <div class="value">${c.odds.toFixed(2)}</div>
-          </div>
-          <div class="coupon-meta">
-            <div class="label">Stawka</div>
-            <div class="value">${fmt(c.stake)} zł</div>
-          </div>
-          <div class="coupon-meta">
-            <div class="label">Wynik</div>
-            <div class="value ${resultColor}">${resultLabel} zł</div>
-          </div>
-          <button class="coupon-delete" onclick="deleteCoupon('${c.id}')">Usuń</button>
-        </div>
-      </div>`;
+            html += `
+              <div class="coupon-card ${c.status}">
+                <div class="cc-data-group">
+                  <div class="cc-metric">
+                    <div class="cc-lbl">Kurs</div>
+                    <div class="cc-val">${c.odds.toFixed(2)}</div>
+                  </div>
+                  <div class="cc-metric">
+                    <div class="cc-lbl">Stawka</div>
+                    <div class="cc-val">${fmt(c.stake)} zł</div>
+                  </div>
+                  <div class="cc-metric" style="min-width: 100px;">
+                    <div class="cc-lbl">Wynik</div>
+                    <div class="cc-val" style="color: ${resultColor}">${resultVal}</div>
+                  </div>
+                </div>
+
+                <div class="cc-actions-group">
+                  <div class="status-actions">
+                    <button class="btn-status ${c.status === "win" ? "active-win" : ""}" onclick="setStatus('${c.id}', 'win')">W</button>
+                    <button class="btn-status ${c.status === "lose" ? "active-lose" : ""}" onclick="setStatus('${c.id}', 'lose')">L</button>
+                    <button class="btn-status ${c.status === "pending" ? "active-pending" : ""}" onclick="setStatus('${c.id}', 'pending')">?</button>
+                  </div>
+                  <button class="btn-delete" onclick="deleteCoupon('${c.id}')">Usuń</button>
+                </div>
+              </div>
+            `;
           });
         });
 
         container.innerHTML = html;
-      }
-
-      function renderTodaySummary() {
-        const t = today();
-        const day = coupons.filter((c) => c.date === t);
-
-        let stake = 0;
-        let payout = 0;
-        let balance = 0;
-
-        day.forEach((c) => {
-          stake += c.stake;
-          if (c.status === "win") {
-            payout += c.stake + c.profit;
-            balance += c.profit;
-          } else if (c.status === "lose") {
-            balance -= c.stake;
-          }
-        });
-
-        document.getElementById("td-count").textContent = day.length;
-        document.getElementById("td-stake").textContent = fmt(stake) + " zł";
-        document.getElementById("td-payout").textContent = fmt(payout) + " zł";
-
-        const balEl = document.getElementById("td-balance");
-        balEl.textContent = (balance >= 0 ? "+" : "") + fmt(balance) + " zł";
-        balEl.style.color =
-          balance > 0
-            ? "var(--green)"
-            : balance < 0
-              ? "var(--red)"
-              : "var(--text)";
-      }
-
-      function renderStats() {
-        const period = document.getElementById("period-select").value;
-        const filtered = filterByPeriod(coupons, period);
-        const resolved = filtered.filter((c) => c.status !== "pending");
-
-        const wins = resolved.filter((c) => c.status === "win");
-        const totalStake = filtered.reduce((s, c) => s + c.stake, 0);
-        const profit = calcBalance(resolved);
-        const yieldPct = totalStake > 0 ? (profit / totalStake) * 100 : 0;
-        const avgOdds = resolved.length
-          ? resolved.reduce((s, c) => s + c.odds, 0) / resolved.length
-          : 0;
-        const avgStake = filtered.length ? totalStake / filtered.length : 0;
-        const wr = resolved.length ? (wins.length / resolved.length) * 100 : 0;
-
-        const pEl = document.getElementById("s-profit");
-        pEl.textContent = (profit >= 0 ? "+" : "") + fmt(profit) + " zł";
-        pEl.style.color =
-          profit >= 0
-            ? "var(--green)"
-            : profit < 0
-              ? "var(--red)"
-              : "var(--text)";
-
-        const yieldStr =
-          yieldPct > 0 ? "+" + yieldPct.toFixed(1) : yieldPct.toFixed(1);
-        document.getElementById("s-roi").textContent =
-          "Yield: " + yieldStr + "%";
-
-        document.getElementById("s-total").textContent = filtered.length;
-        document.getElementById("s-stake-total").textContent =
-          "Stawka: " + fmt(totalStake) + " zł";
-        document.getElementById("s-wins").textContent = wins.length;
-        document.getElementById("s-wr").textContent =
-          "Skuteczność: " + wr.toFixed(0) + "%";
-        document.getElementById("s-avg-odds").textContent =
-          avgOdds > 0 ? avgOdds.toFixed(2) : "—";
-        document.getElementById("s-avg-stake").textContent =
-          "Śr. stawka: " + (avgStake > 0 ? fmt(avgStake) + " zł" : "—");
-
-        const titles = {
-          week: "Ten tydzień",
-          month: "Ten miesiąc",
-          all: "Wszystkie kupony",
-        };
-        document.getElementById("stats-title").textContent = titles[period];
-
-        const lCount = resolved.filter((c) => c.status === "lose").length;
-        document.getElementById("stats-sub").textContent =
-          `${filtered.length} kuponów · ${wins.length} W · ${lCount} L`;
-
-        renderBarChart(filtered, period);
-        renderHistoryTable(filtered);
-      }
-
-      function filterByPeriod(data, period) {
-        const now = new Date();
-        if (period === "all") return data;
-        if (period === "week") {
-          const mon = new Date(now);
-          mon.setDate(
-            now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1),
-          );
-          mon.setHours(0, 0, 0, 0);
-          return data.filter((c) => new Date(c.date) >= mon);
-        }
-        if (period === "month") {
-          const start = new Date(now.getFullYear(), now.getMonth(), 1);
-          return data.filter((c) => new Date(c.date) >= start);
-        }
-        return data;
-      }
-
-      function renderBarChart(data, period) {
-        const chart = document.getElementById("bar-chart");
-        if (!data.length) {
-          chart.innerHTML =
-            '<div style="color:var(--text3);font-size:12px;margin:auto;">Brak danych</div>';
-          return;
-        }
-
-        const byDate = {};
-        data.forEach((c) => {
-          if (!byDate[c.date]) byDate[c.date] = [];
-          byDate[c.date].push(c);
-        });
-
-        let dates = Object.keys(byDate).sort();
-        if (period === "month" || period === "all") {
-          if (dates.length > 30) dates = dates.slice(-30);
-        }
-
-        const balances = dates.map((d) => calcBalance(byDate[d]));
-        const maxAbs = Math.max(...balances.map(Math.abs), 1);
-
-        chart.innerHTML = dates
-          .map((d, i) => {
-            const bal = balances[i];
-            const pct = (Math.abs(bal) / maxAbs) * 90;
-            const cls = bal > 0 ? "positive" : bal < 0 ? "negative" : "zero";
-            const short = d.slice(5);
-            return `<div class="bar-wrap">
-      <div class="bar-val">${bal >= 0 ? "+" : ""}${bal.toFixed(0)}</div>
-      <div class="bar ${cls}" style="height:${pct}px" title="${d}: ${bal.toFixed(2)} zł"></div>
-      <div class="bar-lbl">${short}</div>
-    </div>`;
-          })
-          .join("");
-      }
-
-      function renderHistoryTable(data) {
-        const byDate = {};
-        data.forEach((c) => {
-          if (!byDate[c.date]) byDate[c.date] = [];
-          byDate[c.date].push(c);
-        });
-        const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
-        const body = document.getElementById("history-body");
-
-        if (!dates.length) {
-          body.innerHTML =
-            '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:30px;">Brak danych</td></tr>';
-          return;
-        }
-
-        body.innerHTML = dates
-          .map((d) => {
-            const day = byDate[d];
-            const wins = day.filter((c) => c.status === "win").length;
-            const losses = day.filter((c) => c.status === "lose").length;
-            const stake = day.reduce((s, c) => s + c.stake, 0);
-            const bal = calcBalance(day);
-            const balStr = (bal >= 0 ? "+" : "") + fmt(bal) + " zł";
-            const balColor =
-              bal > 0
-                ? "var(--green)"
-                : bal < 0
-                  ? "var(--red)"
-                  : "var(--text2)";
-
-            let badges = `<span class="badge win">${wins}</span> <span class="badge lose">${losses}</span>`;
-
-            return `<tr>
-      <td>${formatDate(d)}</td>
-      <td>${day.length}</td>
-      <td>${fmt(stake)} zł</td>
-      <td>${badges}</td>
-      <td style="color:${balColor};font-weight:700;">${balStr}</td>
-    </tr>`;
-          })
-          .join("");
-      }
-
-      function calcBalance(dayCoupons) {
-        let bal = 0;
-        dayCoupons.forEach((c) => {
-          if (c.status === "win") bal += c.profit;
-          else if (c.status === "lose") bal -= c.stake;
-        });
-        return parseFloat(bal.toFixed(2));
-      }
-
-      function fmt(n) {
-        return parseFloat(n).toLocaleString("pl-PL", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
-      }
-
-      function formatDate(dateStr) {
-        const d = new Date(dateStr + "T12:00:00");
-        const t = today();
-        if (dateStr === t) return "Dzisiaj";
-        const y = new Date();
-        y.setDate(y.getDate() - 1);
-        if (dateStr === y.toISOString().slice(0, 10)) return "Wczoraj";
-        return d.toLocaleDateString("pl-PL", {
-          day: "2-digit",
-          month: "short",
-        });
-      }
-
-      function esc(s) {
-        const d = document.createElement("div");
-        d.textContent = s;
-        return d.innerHTML;
       }
 
       function toast(msg, type) {
@@ -1413,21 +715,9 @@
         setTimeout(() => (el.className = "toast"), 2500);
       }
 
-      function switchTab(tab) {
-        document
-          .querySelectorAll(".tab")
-          .forEach((t) => t.classList.remove("active"));
-        event.target.classList.add("active");
-        document.getElementById("view-coupons").className =
-          "coupons-view" + (tab === "coupons" ? " active" : "");
-        document.getElementById("view-stats").className =
-          "stats-view" + (tab === "stats" ? " active" : "");
-        if (tab === "stats") renderStats();
-      }
-
       function renderAll() {
+        renderStats();
         renderCoupons();
-        renderTodaySummary();
       }
 
       renderAll();
