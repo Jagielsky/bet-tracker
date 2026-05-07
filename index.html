@@ -248,15 +248,20 @@
       }
 
       .cc-data-group {
-        display: flex;
-        gap: 40px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
         align-items: center;
+        width: 100%;
       }
 
       .cc-metric {
         display: flex;
         flex-direction: column;
         gap: 4px;
+        min-width: 0;
+        align-items: center;
+        text-align: center;
       }
 
       .cc-lbl {
@@ -272,6 +277,7 @@
         font-weight: 800;
         color: #ffffff;
         font-variant-numeric: tabular-nums;
+        white-space: nowrap;
       }
 
       .cc-actions-group {
@@ -388,8 +394,8 @@
         }
         .cc-data-group {
           width: 100%;
-          justify-content: space-between;
-          gap: 10px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
         }
         .cc-actions-group {
           width: 100%;
@@ -401,7 +407,8 @@
           grid-template-columns: 1fr 1fr;
         }
         .cc-data-group {
-          flex-wrap: wrap;
+          grid-template-columns: 1fr;
+          gap: 12px;
         }
       }
     </style>
