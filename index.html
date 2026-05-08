@@ -901,7 +901,6 @@
                   : "#ffffff";
           }
 
-          // Używamy tylko tego, aby nie tracić ostrości (focusu) w polu input
           renderStats();
           updateDayBalance(c.date);
         }
@@ -994,11 +993,29 @@
         const netCapital = deposited - withdrawn;
         const hasManualBalance = accountBalance !== null;
 
+        // --- LOGIKA BAZOWA (HISTORYCZNA) ---
+        // Baza = Wpisany Balans Konta (lewa strona). Jeśli puste, bazą jest Kapitał Wpłacony.
         const baseCapital = hasManualBalance ? accountBalance : netCapital;
+
+        // Balans Konta u góry = Baza + zysk z wprowadzonych tutaj kuponów
         const balance = baseCapital + totalProfit - pendingStake;
 
-        const yieldPct =
-          resolvedStake > 0 ? (totalProfit / resolvedStake) * 100 : 0;
+        // Zysk / Strata całkowita = Prawdziwy obecny balans minus to co wpłaciliśmy (netCapital)
+        // Pozwala to uzyskać wynik np. -1000 jeśli wpłaciliśmy 2000 a obecny balans to 1000
+        const globalProfit =
+          hasManualBalance || netCapital !== 0
+            ? balance - netCapital
+            : totalProfit;
+
+        // Yield bukmacherski vs ROI od kapitału
+        // Jeśli mamy informację o kapitale, liczymy to globalnie.
+        // Jeśli nie, zostaje sam % z kuponów.
+        let yieldPct = 0;
+        if (netCapital > 0) {
+          yieldPct = (globalProfit / netCapital) * 100;
+        } else if (resolvedStake > 0) {
+          yieldPct = (globalProfit / resolvedStake) * 100;
+        }
 
         const winRate = resolved.length
           ? (wins.length / resolved.length) * 100
@@ -1013,11 +1030,11 @@
 
         const pEl = document.getElementById("stat-profit");
         pEl.textContent =
-          (totalProfit > 0 ? "+" : "") + fmt(totalProfit) + " zł";
+          (globalProfit > 0 ? "+" : "") + fmt(globalProfit) + " zł";
         pEl.style.color =
-          totalProfit > 0
+          globalProfit > 0
             ? "var(--win)"
-            : totalProfit < 0
+            : globalProfit < 0
               ? "var(--lose)"
               : "var(--text-main)";
 
