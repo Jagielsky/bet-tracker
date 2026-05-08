@@ -23,6 +23,7 @@
 
         --text-main: #ffffff;
         --text-muted: #8a93a0;
+        --balance-live: #ffd84d;
 
         --win: #00e676;
         --win-bg: #052e18;
@@ -330,7 +331,7 @@
 
       .btn-status:hover {
         transform: translateY(-1px);
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       }
 
       .btn-status.active-win {
@@ -383,7 +384,7 @@
         border: 1px solid var(--border);
         background: var(--bg-panel);
         display: inline-block;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
       }
       .tax-checkbox .box::after {
         content: "";
@@ -578,13 +579,34 @@
           <button class="btn-add" onclick="addCoupon()">Dodaj Kupon</button>
 
           <div class="field">
-            <label>Kapitał początkowy (zł)</label>
+            <label>Kapitał wpłacony (zł)</label>
             <input
               type="number"
-              id="f-capital"
+              id="f-deposited"
               placeholder="Np. 1000"
               step="1"
               min="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>Kapitał wypłacony (zł)</label>
+            <input
+              type="number"
+              id="f-withdrawn"
+              placeholder="Np. 200"
+              step="1"
+              min="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>Balans konta (zł)</label>
+            <input
+              type="number"
+              id="f-account-balance"
+              placeholder="Np. 1450"
+              step="1"
             />
           </div>
         </div>
@@ -592,16 +614,35 @@
 
       <div class="main-content">
         <div class="stats-filter-group">
-          <button class="filter-btn active" onclick="setStatsFilter('all', this)">Wszystko</button>
-          <button class="filter-btn" onclick="setStatsFilter('day', this)">Dzisiaj</button>
-          <button class="filter-btn" onclick="setStatsFilter('week', this)">Tydzień</button>
-          <button class="filter-btn" onclick="setStatsFilter('month', this)">Miesiąc</button>
-          <button class="filter-btn" onclick="setStatsFilter('year', this)">Rok</button>
+          <button
+            class="filter-btn active"
+            onclick="setStatsFilter('all', this)"
+          >
+            Wszystko
+          </button>
+          <button class="filter-btn" onclick="setStatsFilter('day', this)">
+            Dzisiaj
+          </button>
+          <button class="filter-btn" onclick="setStatsFilter('week', this)">
+            Tydzień
+          </button>
+          <button class="filter-btn" onclick="setStatsFilter('month', this)">
+            Miesiąc
+          </button>
+          <button class="filter-btn" onclick="setStatsFilter('year', this)">
+            Rok
+          </button>
         </div>
         <div class="stats-grid">
           <div class="stat-box">
             <div class="stat-lbl">Balans Konta</div>
-            <div class="stat-val" id="stat-balance" style="color: var(--text-main)">0.00 zł</div>
+            <div
+              class="stat-val"
+              id="stat-balance"
+              style="color: var(--balance-live)"
+            >
+              0.00 zł
+            </div>
           </div>
           <div class="stat-box">
             <div class="stat-lbl">Zysk / Strata</div>
@@ -624,8 +665,8 @@
             <div class="stat-val" id="stat-wr">0%</div>
           </div>
           <div class="stat-box">
-            <div class="stat-lbl">Bilans (W / L / ?)</div>
-            <div class="stat-val" id="stat-counts">0 / 0 / 0</div>
+            <div class="stat-lbl">Bilans (W / L / C / ?)</div>
+            <div class="stat-val" id="stat-counts">0 / 0 / 0 / 0</div>
           </div>
           <div class="stat-box">
             <div class="stat-lbl">Postawiono razem</div>
@@ -659,8 +700,28 @@
 
     <script>
       let coupons = JSON.parse(localStorage.getItem("bt_coupons_v3") || "[]");
-      let capital = parseFloat(localStorage.getItem("bt_capital") || "0");
+      let deposited =
+        parseFloat(
+          localStorage.getItem("bt_deposited") ||
+            localStorage.getItem("bt_capital") ||
+            "0",
+        ) || 0;
+      let withdrawn =
+        parseFloat(localStorage.getItem("bt_withdrawn") || "0") || 0;
+      let accountBalanceRaw = localStorage.getItem("bt_account_balance");
+      let accountBalance =
+        accountBalanceRaw === null || accountBalanceRaw === ""
+          ? null
+          : Number.isFinite(parseFloat(accountBalanceRaw))
+            ? parseFloat(accountBalanceRaw)
+            : null;
       let statsFilter = "all";
+
+      function readOptionalNumber(value) {
+        if (value === null || value === "") return null;
+        const parsed = parseFloat(value);
+        return Number.isFinite(parsed) ? parsed : null;
+      }
 
       function save() {
         localStorage.setItem("bt_coupons_v3", JSON.stringify(coupons));
@@ -671,13 +732,17 @@
       function getFilteredCoupons() {
         const now = new Date();
         const dzis = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        
+
         if (statsFilter === "all") return coupons;
-        
+
         return coupons.filter((c) => {
           const couponDate = new Date(c.date);
-          const couponDateOnly = new Date(couponDate.getFullYear(), couponDate.getMonth(), couponDate.getDate());
-          
+          const couponDateOnly = new Date(
+            couponDate.getFullYear(),
+            couponDate.getMonth(),
+            couponDate.getDate(),
+          );
+
           if (statsFilter === "day") {
             return couponDateOnly.getTime() === dzis.getTime();
           } else if (statsFilter === "week") {
@@ -685,8 +750,10 @@
             weekAgo.setDate(weekAgo.getDate() - 7);
             return couponDateOnly >= weekAgo && couponDateOnly <= dzis;
           } else if (statsFilter === "month") {
-            return couponDate.getFullYear() === now.getFullYear() &&
-                   couponDate.getMonth() === now.getMonth();
+            return (
+              couponDate.getFullYear() === now.getFullYear() &&
+              couponDate.getMonth() === now.getMonth()
+            );
           } else if (statsFilter === "year") {
             return couponDate.getFullYear() === now.getFullYear();
           }
@@ -703,18 +770,57 @@
         });
       }
 
+      function getPayout(c) {
+        let initialStake = c.stake;
+        let stakeAfterTax = c.tax ? initialStake * 0.88 : initialStake;
+        let possibleWin = stakeAfterTax * c.odds;
+        let payout = possibleWin;
+
+        if (possibleWin > 2280) {
+          let taxBase = Math.round(possibleWin);
+          let taxAmount = Math.round(taxBase * 0.1);
+          payout = possibleWin - taxAmount;
+        }
+        return payout;
+      }
+
       document.getElementById("f-date").value = today();
       document.getElementById("headerDate").textContent = formatDatePL(
         new Date(),
       );
-      document.getElementById("f-capital").value = capital > 0 ? capital : "";
+      document.getElementById("f-deposited").value =
+        deposited > 0 ? deposited : "";
+      document.getElementById("f-withdrawn").value =
+        withdrawn > 0 ? withdrawn : "";
+      document.getElementById("f-account-balance").value =
+        accountBalance !== null ? accountBalance : "";
 
-      document.getElementById("f-capital").addEventListener("change", (e) => {
+      document.getElementById("f-deposited").addEventListener("input", (e) => {
         const val = parseFloat(e.target.value) || 0;
-        capital = val;
-        localStorage.setItem("bt_capital", val.toString());
+        deposited = val;
+        localStorage.setItem("bt_deposited", val.toString());
         renderStats();
       });
+
+      document.getElementById("f-withdrawn").addEventListener("input", (e) => {
+        const val = parseFloat(e.target.value) || 0;
+        withdrawn = val;
+        localStorage.setItem("bt_withdrawn", val.toString());
+        renderStats();
+      });
+
+      document
+        .getElementById("f-account-balance")
+        .addEventListener("input", (e) => {
+          const val = readOptionalNumber(e.target.value);
+          accountBalance = val;
+          if (val === null) {
+            localStorage.removeItem("bt_account_balance");
+          } else {
+            localStorage.setItem("bt_account_balance", val.toString());
+          }
+          renderStats();
+        });
 
       function fmt(n) {
         return parseFloat(n).toLocaleString("pl-PL", {
@@ -779,18 +885,25 @@
         if (c) {
           c.cashout = parseFloat(amount) || 0;
           save();
-          
+
           let payout = parseFloat(c.cashout) || 0;
           const finalResult = payout - c.stake;
-          
+
           const resultEl = document.getElementById(`result-${c.id}`);
           if (resultEl) {
-            resultEl.textContent = (finalResult > 0 ? "+" : "") + fmt(finalResult) + " zł";
-            resultEl.style.color = finalResult > 0 ? "var(--win)" : finalResult < 0 ? "var(--lose)" : "#ffffff";
+            resultEl.textContent =
+              (finalResult > 0 ? "+" : "") + fmt(finalResult) + " zł";
+            resultEl.style.color =
+              finalResult > 0
+                ? "var(--win)"
+                : finalResult < 0
+                  ? "var(--lose)"
+                  : "#ffffff";
           }
-          
+
+          // Używamy tylko tego, aby nie tracić ostrości (focusu) w polu input
           renderStats();
-          updateDayBalance(c.date); // Dynamiczna aktualizacja bilansu dnia
+          updateDayBalance(c.date);
         }
       }
 
@@ -812,28 +925,19 @@
 
       function updateDayBalance(targetDate) {
         const filtered = getFilteredCoupons();
-        const dayCoupons = filtered.filter(c => c.date === targetDate);
+        const dayCoupons = filtered.filter((c) => c.date === targetDate);
         let dayBalance = 0;
 
         dayCoupons.forEach((c) => {
           if (c.status === "win") {
-            let initialStake = c.stake;
-            let stakeAfterTax = c.tax ? initialStake * 0.88 : initialStake;
-            let possibleWin = stakeAfterTax * c.odds;
-            let payout = possibleWin;
-            if (possibleWin > 2280) {
-              let taxBase = Math.round(possibleWin);
-              let taxAmount = Math.round(taxBase * 0.10);
-              payout = possibleWin - taxAmount;
-            }
-            dayBalance += (payout - c.stake);
-          }
-          else if (c.status === "lose") {
+            dayBalance += getPayout(c) - c.stake;
+          } else if (c.status === "lose") {
             dayBalance -= c.stake;
-          }
-          else if (c.status === "cashout") {
+          } else if (c.status === "cashout") {
             let payout = parseFloat(c.cashout) || 0;
-            dayBalance += (payout - c.stake);
+            dayBalance += payout - c.stake;
+          } else if (c.status === "pending") {
+            dayBalance -= c.stake;
           }
         });
 
@@ -862,47 +966,40 @@
 
         const totalStake = filtered.reduce((s, c) => s + c.stake, 0);
         const pendingStake = pending.reduce((s, c) => s + c.stake, 0);
+        const resolvedStake = resolved.reduce((s, c) => s + c.stake, 0);
         const avgStake = filtered.length ? totalStake / filtered.length : 0;
 
         let totalProfit = 0;
         let maxWin = 0;
         let maxLoss = 0;
-        
+
         resolved.forEach((c) => {
           if (c.status === "win") {
-            let initialStake = c.stake;
-            let stakeAfterTax = c.tax ? initialStake * 0.88 : initialStake;
-            let possibleWin = stakeAfterTax * c.odds;
-            let payout = possibleWin;
-            if (possibleWin > 2280) {
-              let taxBase = Math.round(possibleWin);
-              let taxAmount = Math.round(taxBase * 0.10);
-              payout = possibleWin - taxAmount;
-            }
-            const finalProfit = payout - c.stake;
+            const finalProfit = getPayout(c) - c.stake;
             totalProfit += finalProfit;
             maxWin = Math.max(maxWin, finalProfit);
           } else if (c.status === "lose") {
             totalProfit -= c.stake;
             maxLoss = Math.min(maxLoss, -c.stake);
-          }
-        });
-
-        cashouts.forEach((c) => {
-          let payout = parseFloat(c.cashout) || 0;
-          const finalResult = payout - c.stake;
-          totalProfit += finalResult;
-          if (finalResult > 0) {
-            maxWin = Math.max(maxWin, finalResult);
-          } else if (finalResult < 0) {
-            maxLoss = Math.min(maxLoss, finalResult);
+          } else if (c.status === "cashout") {
+            let payout = parseFloat(c.cashout) || 0;
+            const finalResult = payout - c.stake;
+            totalProfit += finalResult;
+            if (finalResult > 0) maxWin = Math.max(maxWin, finalResult);
+            else if (finalResult < 0) maxLoss = Math.min(maxLoss, finalResult);
           }
         });
 
         const avgResult = resolved.length ? totalProfit / resolved.length : 0;
-        const balance = capital + totalProfit - pendingStake;
+        const netCapital = deposited - withdrawn;
+        const hasManualBalance = accountBalance !== null;
 
-        const yieldPct = capital > 0 ? (totalProfit / capital) * 100 : 0;
+        const baseCapital = hasManualBalance ? accountBalance : netCapital;
+        const balance = baseCapital + totalProfit - pendingStake;
+
+        const yieldPct =
+          resolvedStake > 0 ? (totalProfit / resolvedStake) * 100 : 0;
+
         const winRate = resolved.length
           ? (wins.length / resolved.length) * 100
           : 0;
@@ -912,7 +1009,7 @@
 
         const balEl = document.getElementById("stat-balance");
         balEl.textContent = fmt(balance) + " zł";
-        balEl.style.color = "var(--text-main)";
+        balEl.style.color = "var(--balance-live)";
 
         const pEl = document.getElementById("stat-profit");
         pEl.textContent =
@@ -940,14 +1037,12 @@
         document.getElementById("stat-wr").textContent =
           winRate.toFixed(0) + "%";
         document.getElementById("stat-counts").textContent =
-          `${wins.length} / ${losses.length} / ${pending.length}`;
-        
+          `${wins.length} / ${losses.length} / ${cashouts.length} / ${pending.length}`;
         document.getElementById("stat-total-stake").textContent =
           fmt(totalStake) + " zł";
-        
         document.getElementById("stat-avg-stake").textContent =
           fmt(avgStake) + " zł";
-        
+
         const avgResEl = document.getElementById("stat-avg-result");
         avgResEl.textContent =
           (avgResult > 0 ? "+" : "") + fmt(avgResult) + " zł";
@@ -957,14 +1052,15 @@
             : avgResult < 0
               ? "var(--lose)"
               : "var(--text-main)";
-        
+
         const maxWinEl = document.getElementById("stat-max-win");
         maxWinEl.textContent = maxWin > 0 ? "+" + fmt(maxWin) + " zł" : "—";
         maxWinEl.style.color = maxWin > 0 ? "var(--win)" : "var(--text-muted)";
-        
+
         const maxLossEl = document.getElementById("stat-max-loss");
         maxLossEl.textContent = maxLoss < 0 ? fmt(maxLoss) + " zł" : "—";
-        maxLossEl.style.color = maxLoss < 0 ? "var(--lose)" : "var(--text-muted)";
+        maxLossEl.style.color =
+          maxLoss < 0 ? "var(--lose)" : "var(--text-muted)";
       }
 
       function renderCoupons() {
@@ -984,7 +1080,6 @@
         const sortedDates = Object.keys(byDate).sort((a, b) =>
           b.localeCompare(a),
         );
-
         let html = "";
 
         sortedDates.forEach((date) => {
@@ -992,23 +1087,17 @@
 
           byDate[date].forEach((c) => {
             if (c.status === "win") {
-              let initialStake = c.stake;
-              let stakeAfterTax = c.tax ? initialStake * 0.88 : initialStake;
-              let possibleWin = stakeAfterTax * c.odds;
-              let payout = possibleWin;
-              if (possibleWin > 2280) {
-                let taxBase = Math.round(possibleWin);
-                let taxAmount = Math.round(taxBase * 0.10);
-                payout = possibleWin - taxAmount;
-              }
-              dayBalance += (payout - c.stake);
-            }
-            else if (c.status === "lose") dayBalance -= c.stake;
-            else if (c.status === "cashout") {
+              dayBalance += getPayout(c) - c.stake;
+            } else if (c.status === "lose") {
+              dayBalance -= c.stake;
+            } else if (c.status === "cashout") {
               let payout = parseFloat(c.cashout) || 0;
-              dayBalance += (payout - c.stake);
+              dayBalance += payout - c.stake;
+            } else if (c.status === "pending") {
+              dayBalance -= c.stake;
             }
           });
+
           let balColor = "var(--text-main)";
           let balPrefix = "";
           if (dayBalance > 0) {
@@ -1020,7 +1109,6 @@
 
           const formattedDate = formatDatePL(date);
 
-          // Dodano ID do kontenera z bilansem dnia
           html += `
             <div class="day-divider">
               <div class="day-date">${formattedDate}</div>
@@ -1029,59 +1117,59 @@
           `;
 
           byDate[date].forEach((c) => {
-                let initialStake = c.stake;
-                let stakeAfterTax = c.tax ? initialStake * 0.88 : initialStake;
-                let possibleWin = stakeAfterTax * c.odds;
-                let pendingPayout = possibleWin;
-                let pendingTaxes = [];
-                if (c.tax) pendingTaxes.push("12%");
-                if (possibleWin > 2280) {
-                  let taxBase = Math.round(possibleWin);
-                  let taxAmount = Math.round(taxBase * 0.10);
-                  pendingPayout = possibleWin - taxAmount;
-                  pendingTaxes.push("10%");
-                }
+            let possibleWin = getPayout(c);
+            let pendingTaxes = [];
 
-                let resultVal = "—";
-                let resultColor = "#ffffff";
-                let extraNoteHtml = "";
-                
-                if (c.status === "pending" && pendingTaxes.length > 0) {
-                  extraNoteHtml = `<div class="cc-note" style="font-size:10px;color:var(--text-muted);margin-top:2px">Możliwy podatek: ${pendingTaxes.join(" + ")}</div>`;
-                }
+            let initialStake = c.stake;
+            let stakeAfterTax = c.tax ? initialStake * 0.88 : initialStake;
+            let rawWin = stakeAfterTax * c.odds;
+            if (c.tax) pendingTaxes.push("12%");
+            if (rawWin > 2280) pendingTaxes.push("10%");
 
-                if (c.status === "win") {
-                  let payout = pendingPayout;
-                  let taxes = pendingTaxes;
-                  
-                  const finalProfit = payout - c.stake;
-                  if (taxes.length > 0) {
-                    extraNoteHtml = `<div class="cc-note" style="font-size:10px;color:var(--text-muted);margin-top:2px">Podatek: ${taxes.join(" + ")}</div>`;
-                  }
-                  resultVal = (finalProfit > 0 ? "+" : "") + fmt(finalProfit) + " zł";
-                  resultColor = "var(--win)";
-                } else if (c.status === "lose") {
-                  resultVal = "-" + fmt(c.stake) + " zł";
-                  resultColor = "var(--lose)";
-                } else if (c.status === "cashout") {
-                  let payout = parseFloat(c.cashout) || 0;
-                  const finalCashout = payout - c.stake;
-                  resultVal = (finalCashout > 0 ? "+" : "") + fmt(finalCashout) + " zł";
-                  resultColor = finalCashout > 0 ? "var(--win)" : (finalCashout < 0 ? "var(--lose)" : "#ffffff");
-                }
+            let resultVal = "—";
+            let resultColor = "#ffffff";
+            let extraNoteHtml = "";
 
-                let cashoutInputHtml = "";
-                if (c.status === "cashout") {
-                  cashoutInputHtml = `<input type="number" class="coupon-cashout-input" placeholder="Kwota" value="${c.cashout || 0}" oninput="setCashout('${c.id}', this.value)" min="0" step="1" max="99999" />`;
-                } else {
-                  cashoutInputHtml = `<input type="number" class="coupon-cashout-input" disabled />`;
-                }
+            if (c.status === "pending" && pendingTaxes.length > 0) {
+              extraNoteHtml = `<div class="cc-note" style="font-size:10px;color:var(--text-muted);margin-top:2px">Możliwy podatek: ${pendingTaxes.join(" + ")}</div>`;
+            }
+
+            if (c.status === "win") {
+              const finalProfit = possibleWin - c.stake;
+              if (pendingTaxes.length > 0) {
+                extraNoteHtml = `<div class="cc-note" style="font-size:10px;color:var(--text-muted);margin-top:2px">Podatek: ${pendingTaxes.join(" + ")}</div>`;
+              }
+              resultVal =
+                (finalProfit > 0 ? "+" : "") + fmt(finalProfit) + " zł";
+              resultColor = "var(--win)";
+            } else if (c.status === "lose") {
+              resultVal = "-" + fmt(c.stake) + " zł";
+              resultColor = "var(--lose)";
+            } else if (c.status === "cashout") {
+              let payout = parseFloat(c.cashout) || 0;
+              const finalCashout = payout - c.stake;
+              resultVal =
+                (finalCashout > 0 ? "+" : "") + fmt(finalCashout) + " zł";
+              resultColor =
+                finalCashout > 0
+                  ? "var(--win)"
+                  : finalCashout < 0
+                    ? "var(--lose)"
+                    : "#ffffff";
+            }
+
+            let cashoutInputHtml = "";
+            if (c.status === "cashout") {
+              cashoutInputHtml = `<input type="number" class="coupon-cashout-input" placeholder="Kwota" value="${c.cashout || 0}" oninput="setCashout('${c.id}', this.value)" min="0" step="1" max="99999" />`;
+            } else {
+              cashoutInputHtml = `<input type="number" class="coupon-cashout-input" disabled />`;
+            }
 
             html += `
               <div class="coupon-card ${c.status}">
                 <div class="cc-data-group">
                   <div class="cc-tax-cell">
-                    <label class="tax-checkbox"><input type="checkbox" onchange="toggleTax('${c.id}', this.checked)" ${c.tax ? 'checked' : ''}><span class="box"></span></label>
+                    <label class="tax-checkbox"><input type="checkbox" onchange="toggleTax('${c.id}', this.checked)" ${c.tax ? "checked" : ""}><span class="box"></span></label>
                     <div class="tax-label">Podatek</div>
                   </div>
                   <div class="cc-metric">
@@ -1119,7 +1207,7 @@
 
       function setStatsFilter(filter, btn) {
         statsFilter = filter;
-        document.querySelectorAll(".filter-btn").forEach(b => {
+        document.querySelectorAll(".filter-btn").forEach((b) => {
           b.classList.remove("active");
         });
         if (btn && btn.classList) btn.classList.add("active");
